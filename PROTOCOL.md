@@ -1,4 +1,4 @@
-#### Cananka USB Protocol ####
+#### Cananka Protocol ####
 
 This device is compatible with SLCAN protocol and most of its communication will
 follow the same. Serial port parameters are 115200,N,8,1.
