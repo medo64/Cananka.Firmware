@@ -16,21 +16,21 @@ uint8_t cachedRevision;
 
 
 void device_init() {
-    // | A3 | A5 | B0 | B1 | B4 | Type          | Revision  | PIC Clock | UART Clock | Termination | Power Supply |
-    // |----|----|----|----|----|---------------|-----------|-----------|------------|-------------|--------------|
-    // | X  | X  | L  | H  | H  | Standard      | 3 (A)     | Crystal   | PIC        | No          | No           |
-    // | L  | L  | L  | L  | H  | Mini          | 4 (D)     | MCP2221A  | MCP2221A   | Yes         | Yes          |
-    // | L  | L  | H  | L  | H  | Framework     | 4 (D)     | MCP2221A  | MCP2221A   | Yes         | No           |
-    // | L  | L  | H  | H  | H  | Mini          | 1 (A B C) | MCP2221   | MCP2221    | Yes         | Yes          |
-    // | L  | H  | L  | L  | H  | Standard      | 4 (D)     | Crystal   | MCP2221A   | No          | No           |
-    // | L  | H  | L  | H  | H  | Standard      | 3 (C)     | Crystal   | PIC        | No          | No           |
-    // | L  | H  | H  | H  | H  | Standard      | 2 (B)     | Crystal   | PIC        | No          | No           |
-    // | H  | H  | L  | L  | H  | Standard/RJ45 | 4 (D)     | Crystal   | MCP2221A   | No          | No           |
-    // | H  | H  | L  | H  | H  | Standard/RJ45 | 3 (C)     | Crystal   | PIC        | No          | No           |
-    // | H  | H  | H  | H  | H  | Standard/RJ45 | 2 (B)     | Crystal   | PIC        | No          | No           |
-    // | L  | H  | L  | L  | L  | Standard      | 5 (E)     | Crystal   | MCP2221A   | No          | No           |
-    // | L  | L  | L  | L  | L  | Mini          | 5 (E)     | MCP2221A  | MCP2221A   | Yes         | No           |
-    // | H  | L  | L  | L  | L  | Framework     | 5 (E)     | MCP2221A  | MCP2221A   | Yes         | No           |
+    // | A3 | A5 | B0 | B1 | B4 | Type          | Revision  | PIC Clock | UART Clock | Termination | Power Supply   |
+    // |----|----|----|----|----|---------------|-----------|-----------|------------|-------------|----------------|
+    // | X  | X  | L  | H  | H  | Standard      | 3 (A)     | Crystal   | PIC        | No          | No             |
+    // | L  | L  | L  | L  | H  | Mini          | 4 (D)     | MCP2221A  | MCP2221A   | Yes         | Yes (5V)       |
+    // | L  | L  | H  | L  | H  | Framework     | 4 (D)     | MCP2221A  | MCP2221A   | Yes         | No  (5V)       |
+    // | L  | L  | H  | H  | H  | Mini          | 1 (A B C) | MCP2221   | MCP2221    | Yes         | Yes            |
+    // | L  | H  | L  | L  | H  | Standard      | 4 (D)     | Crystal   | MCP2221A   | No          | No             |
+    // | L  | H  | L  | H  | H  | Standard      | 3 (C)     | Crystal   | PIC        | No          | No             |
+    // | L  | H  | H  | H  | H  | Standard      | 2 (B)     | Crystal   | PIC        | No          | No             |
+    // | H  | H  | L  | L  | H  | Standard/RJ45 | 4 (D)     | Crystal   | MCP2221A   | No          | No             |
+    // | H  | H  | L  | H  | H  | Standard/RJ45 | 3 (C)     | Crystal   | PIC        | No          | No             |
+    // | H  | H  | H  | H  | H  | Standard/RJ45 | 2 (B)     | Crystal   | PIC        | No          | No             |
+    // | L  | H  | L  | L  | L  | Standard      | 5 (E)     | Crystal   | MCP2221A   | No          | No             |
+    // | L  | L  | L  | L  | L  | Mini          | 5 (E)     | MCP2221A  | MCP2221A   | Yes         | Yes (5V/400mA) |
+    // | H  | L  | L  | L  | L  | Framework     | 5 (E)     | MCP2221A  | MCP2221A   | Yes         | No             |
 
     nRBPU = 0; //enable port B pull-ups
     WPUB0 = 1; WPUB1 = 1; WPUB4 = 1;
