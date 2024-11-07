@@ -4,7 +4,6 @@
 
 #include "app.h"
 #include "can.h"
-#include "device.h"
 #include "io.h"
 #include "uart.h"
 #include "settings.h"

@@ -4,7 +4,6 @@
 #include "app.h"
 #include "can.h"
 #include "command.h"
-#include "device.h"
 #include "io.h"
 #include "random.h"
 #include "settings.h"
@@ -258,25 +257,12 @@ void init(void) {
     REFOCONbits.RODIV0 = 0;
     REFOCONbits.ROSEL = 1;
     REFOCONbits.ROSSLP = 1;
-    TRISC3 = 0;
 
-    //versioning
     WPUB = 0; //disable all pull-ups
-    device_init();
-
-    //io
-    TRISC5 = 0; //O LED
-    TRISC4 = 0; //O Termination
-    TRISB5 = 0; //O Power
-    TRISC2 = 0; //O Enabled
-
-    //clear all outputs
-    LATA = 0b00000000;
-    LATB = 0b00000000;
-    LATC = 0b00000000;
 
     if (device_needsClockOut()) {
         LC3 = 1;
+        TRISC3 = 0;
         REFOCONbits.ROON = 1;
     }
 }
