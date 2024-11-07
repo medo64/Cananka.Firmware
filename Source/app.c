@@ -28,7 +28,7 @@ void sendRandomMessage(void);
 
 void main(void) {
     init();
-    io_setup();
+    io_init();
 
     if (device_supportsTermination()) { io_out_terminationOn(); } //termination on by default
 

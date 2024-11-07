@@ -107,8 +107,8 @@ void init(void);
 // | H  | H  | L  | L  | H  | Standard/RJ45 | 4 (D)     | Crystal   | MCP2221A   | No          | No             | +
 // | H  | H  | L  | H  | H  | Standard/RJ45 | 3 (C)     | Crystal   | PIC        | No          | No             | +
 // | H  | H  | H  | H  | H  | Standard/RJ45 | 2 (B)     | Crystal   | PIC        | No          | No             | +
-// | L  | H  | L  | L  | L  | Standard      | 5 (E)     | Crystal   | MCP2221A   | No          | No             | +
-// | L  | L  | L  | L  | L  | Mini          | 5 (E)     | MCP2221A  | MCP2221A   | Yes         | Yes (5V/400mA) | +
+// | L  | H  | L  | L  | L  | Standard      | 5 (E)     | Crystal   | FT230X     | Yes         | No             | +
+// | L  | L  | L  | L  | L  | Mini          | 5 (E)     | MCP2221A  | MCP2221A   | Yes         | No             | +
 // | H  | L  | L  | L  | L  | Framework     | 5 (E)     | MCP2221A  | MCP2221A   | Yes         | No             | +
 
 #if defined(CANANKA_REVISION_A) && !defined(CANANKA_REVISION_B) && !defined(CANANKA_REVISION_C) && !defined(CANANKA_REVISION_D) && !defined(CANANKA_REVISION_E)
