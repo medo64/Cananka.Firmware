@@ -251,7 +251,7 @@ bool command_process(uint8_t *buffer, uint8_t count) {
                     case 'Y':
                         if (device_supports920K()) {
                             settings_setUsartBaudRate(921600);
-                            reset();
+                            Reset();
                             return true;
                         } else {
                             sendErrorDetail('e');
@@ -260,7 +260,7 @@ bool command_process(uint8_t *buffer, uint8_t count) {
                     case 'Z':
                         if (device_supports460K()) {
                             settings_setUsartBaudRate(460800);
-                            reset();
+                            Reset();
                             return true;
                         } else {
                             sendErrorDetail('e');
@@ -269,19 +269,19 @@ bool command_process(uint8_t *buffer, uint8_t count) {
                     case '0':
                         if (device_supports230K()) {
                             settings_setUsartBaudRate(230400);
-                            reset();
+                            Reset();
                             return true;
                         } else {
                             sendErrorDetail('e');
                             return false;
                         }
-                    case '1': settings_setUsartBaudRate(115200); reset(); return true;
-                    case '2':  settings_setUsartBaudRate(57600); reset(); return true;
-                    case '3':  settings_setUsartBaudRate(38400); reset(); return true;
-                    case '4':  settings_setUsartBaudRate(19200); reset(); return true;
-                    case '5':   settings_setUsartBaudRate(9600); reset(); return true;
-                    case '6':   settings_setUsartBaudRate(2400); reset(); return true;
-                    case '~':      settings_setUsartBaudRate(0); reset(); return true;
+                    case '1': settings_setUsartBaudRate(115200); Reset(); return true;
+                    case '2':  settings_setUsartBaudRate(57600); Reset(); return true;
+                    case '3':  settings_setUsartBaudRate(38400); Reset(); return true;
+                    case '4':  settings_setUsartBaudRate(19200); Reset(); return true;
+                    case '5':   settings_setUsartBaudRate(9600); Reset(); return true;
+                    case '6':   settings_setUsartBaudRate(2400); Reset(); return true;
+                    case '~':      settings_setUsartBaudRate(0); Reset(); return true;
                     default: {
                         sendErrorDetail('p');
                         return false;
@@ -490,7 +490,7 @@ bool command_process_extra(uint8_t *buffer, uint8_t count) {
 
         case 'R': {
             if (count == 1) {
-                reset();
+                Reset();
                 return true;
             } else {
                 sendErrorDetail('p');

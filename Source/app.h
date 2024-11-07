@@ -87,7 +87,6 @@
 
 #define interrupt_enable()   GIE = 1
 #define interrupt_disable()  GIE = 0
-#define reset(void)          Reset()
 #define wait_short(void)     __delay_ms(150)
 
 void init(void);

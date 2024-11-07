@@ -4,6 +4,7 @@ Binaries/**
 Source/*.err
 Source/*.obj
 Source/build/**
+Source/debug/**
 Source/disassembly/**
 Source/dist/**
 Source/funclist
