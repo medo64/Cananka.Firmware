@@ -215,6 +215,7 @@ Second digit of hardware revisions shows board type:
   * 0: Cananka
   * 1: Cananka RJ45 (abandoned)
   * 2: Cananka Mini
+  * 3: Cananka FEC
 
 
 ###### Serial number (N) ######

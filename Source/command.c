@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#include "app.h"
 #include "can.h"
 #include "device.h"
 #include "hardware.h"
@@ -202,7 +203,8 @@ bool command_process(uint8_t *buffer, uint8_t count) {
                 uart_writeString("V");
                 uart_writeUInt8(device_getMajor());
                 uart_writeUInt8(device_getMinor());
-                uart_writeString("10"); //software version
+                uart_writeUInt8(SOFTWARE_VERSION_MAJOR);
+                uart_writeUInt8(SOFTWARE_VERSION_MINOR);
                 return true;
             } else {
                 sendErrorDetail('p');

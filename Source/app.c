@@ -1,6 +1,7 @@
 #include <p18cxxx.h>
 #include <stdbool.h>
 
+#include "app.h"
 #include "can.h"
 #include "command.h"
 #include "device.h"

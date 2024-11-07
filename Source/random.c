@@ -1,4 +1,4 @@
-#include <p18cxxx.h>
+#include <xc.h>
 #include <stdint.h>
 
 #include "random.h"
