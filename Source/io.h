@@ -15,4 +15,8 @@ void io_setup(void);
 #define io_out_powerOff()        LB5 = 1
 #define io_out_getPower()        !LB5
 
+#define io_out_enabledOn()       LC2 = 0
+#define io_out_enabledOff()      LC2 = 1
+#define io_out_getEnabled()      !LC2
+
 #endif

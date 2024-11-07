@@ -5,7 +5,6 @@
 #include "can.h"
 #include "command.h"
 #include "device.h"
-#include "hardware.h"
 #include "io.h"
 #include "random.h"
 #include "settings.h"
@@ -32,7 +31,6 @@ void main(void) {
     init();
     io_setup();
 
-    if (device_needsClockOut()) { activate_clockOut(); } //for older FTDI-based devices
     if (device_supportsTermination()) { io_out_terminationOn(); } //termination on by default
 
     for (uint8_t i = 0; i < 3; i++) {
@@ -240,4 +238,45 @@ void sendRandomMessage() {
     }
 
     can_write(message);
+}
+
+
+void init(void) {
+    //disable interrupts
+    GIE = 0;
+
+    random_init();
+
+    //wait for PLL lock
+    PLLEN = 1;
+    while (!OSCCONbits.OSTS);
+    __delay_ms(250);
+
+    REFOCONbits.RODIV3 = 0;
+    REFOCONbits.RODIV2 = 0;
+    REFOCONbits.RODIV1 = 0;
+    REFOCONbits.RODIV0 = 0;
+    REFOCONbits.ROSEL = 1;
+    REFOCONbits.ROSSLP = 1;
+    TRISC3 = 0;
+
+    //versioning
+    WPUB = 0; //disable all pull-ups
+    device_init();
+
+    //io
+    TRISC5 = 0; //O LED
+    TRISC4 = 0; //O Termination
+    TRISB5 = 0; //O Power
+    TRISC2 = 0; //O Enabled
+
+    //clear all outputs
+    LATA = 0b00000000;
+    LATB = 0b00000000;
+    LATC = 0b00000000;
+
+    if (device_needsClockOut()) {
+        LC3 = 1;
+        REFOCONbits.ROON = 1;
+    }
 }
