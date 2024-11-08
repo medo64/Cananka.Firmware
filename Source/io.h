@@ -1,5 +1,7 @@
-#ifndef IO_H
-#define IO_H
+#pragma once
+
+#include <xc.h>
+#include "app.h"
 
 void io_init(void);
 
@@ -15,8 +17,4 @@ void io_init(void);
 #define io_out_powerOff()        LB5 = 1
 #define io_out_getPower()        !LB5
 
-#define io_out_enabledOn()       LC2 = 0
-#define io_out_enabledOff()      LC2 = 1
-#define io_out_getEnabled()      !LC2
-
-#endif
+#define io_out_getEnabled()      !RC2
