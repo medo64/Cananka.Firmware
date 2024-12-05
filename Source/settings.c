@@ -36,8 +36,8 @@ uint8_t eeprom18_read(uint16_t offset) {
     EECON1bits.EEPGD = 0; //accesses Flash program memory
     EECON1bits.CFGS = 0; //accesses Flash program or data EEPROM memory
 
-    EEADRH = offset >> 8;
-    EEADR = offset;
+    EEADRH = (uint8_t)(offset >> 8);
+    EEADR = (uint8_t)offset;
 
     EECON1bits.RD = 1; //initiates an EEPROM read
     Nop(); //it can be read after one NOP instruction
@@ -49,13 +49,13 @@ void eeprom18_write(uint16_t offset, uint8_t value) {
     EECON1bits.EEPGD = 0; //accesses Flash program memory
     EECON1bits.CFGS = 0; //accesses Flash program or data EEPROM memory
 
-    EEADRH = offset >> 8;
-    EEADR = offset;
+    EEADRH = (uint8_t)(offset >> 8);
+    EEADR = (uint8_t)offset;
 
     EEDATA = value;
 
     EECON1bits.WREN = 1; //allows write cycles
-    uint8_t oldGIE = GIE; //interrupts be disabled during this code segment
+    unsigned oldGIE = GIE; //interrupts be disabled during this code segment
 
     EECON2 = 0x55; //write sequence unlock
     EECON2 = 0xAA; //write sequence unlock
@@ -63,7 +63,7 @@ void eeprom18_write(uint16_t offset, uint8_t value) {
     EECON1bits.WR = 1; //initiates a data EEPROM erase/write cycle
     while(EECON1bits.WR); //waits for write cycle to complete
 
-    GIE = oldGIE; //restore interrupts
+    GIE = (__bit)oldGIE; //restore interrupts
     EECON1bits.WREN = 0; //disable write
 }
 

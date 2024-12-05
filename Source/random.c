@@ -22,7 +22,7 @@ uint8_t randomIndex = 0;
 
 uint8_t random_getByte() {
     if (randomIndex == 0) { //switch polynomial every 256 rounds
-        randomState = (randomState ^ (TMR4 << 8 | TMR4) ^ polynomial) | 0x8000; //ensure non-zero at cost of LSB
+        randomState = (randomState ^ ((uint16_t)TMR4 << 8 | TMR4) ^ polynomial) | 0x8000; //ensure non-zero at cost of LSB
         polynomial = POLYNOMIALS[TMR4 & 0x0F];
     }
     randomIndex++;
