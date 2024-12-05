@@ -63,7 +63,7 @@ void can_init() {
     CIOCONbits.ENDRHI = 1; //drive Vdd when recessive
 
     CANCONbits.REQOP = 0b100; //set to Configuration mode
-    while ((CANSTAT & 0b11100000) != 0b10000000);
+    while (CANSTATbits.OPMODE != 0b100);
 
     BRGCON2bits.SEG2PHTS =  1; //freely programmable SEG2PH
     ECANCONbits.MDSEL = 2; //enhanced FIFO mode
@@ -73,6 +73,7 @@ void can_init() {
     }
 
     CANCONbits.REQOP = 0b001; //set to sleep/disabled
+    while (CANSTATbits.OPMODE != 0b001);
     canState = CAN_STATE_CLOSED;
 }
 
@@ -136,27 +137,27 @@ uint16_t can_getSpeed() {
 
 void can_open() {
     CANCONbits.REQOP = 0b000; //set to normal mode
-    while (CANCONbits.REQOP != 0b000);
+    while (CANSTATbits.OPMODE != 0b000);
     canState = CAN_STATE_OPEN;
 }
 
 void can_openListenOnly() {
     CANCONbits.REQOP = 0b011; //set to listen-only mode
-    while (CANCONbits.REQOP != 0b011);
+    while (CANSTATbits.OPMODE != 0b011);
     canState = CAN_STATE_OPEN_LISTENONLY;
 }
 
 void can_openLoopback() {
     CANCONbits.REQOP = 0b010; //set to loopback mode
-    while (CANCONbits.REQOP != 0b010);
+    while (CANSTATbits.OPMODE != 0b010);
     canState = CAN_STATE_OPEN_LOOPBACK;
 }
 
 void can_close() {
     CANCONbits.REQOP = 0b100; //set to configuration
-    while (CANCONbits.REQOP != 0b100);
+    while (CANSTATbits.OPMODE != 0b100);
     CANCONbits.REQOP = 0b001; //set to sleep/disabled
-    while (CANCONbits.REQOP != 0b001);
+    while (CANSTATbits.OPMODE != 0b001);
     canState = CAN_STATE_CLOSED;
 }
 
