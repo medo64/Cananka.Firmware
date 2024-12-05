@@ -21,7 +21,7 @@ void uart_init_withReadInterrupt() {
 }
 
 void uart_setup(uint32_t desiredBaudRate) {
-    SPBRG = (uint16_t)(_XTAL_FREQ / desiredBaudRate / 4);
+    SPBRG = (uint8_t)(_XTAL_FREQ / desiredBaudRate / 4);
     BRG161 = 1; //16-bit
     BRGH1  = 1; //high speed
     SYNC1  = 0; //asynchronous mode

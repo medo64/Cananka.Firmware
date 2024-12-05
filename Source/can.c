@@ -185,7 +185,7 @@ bool can_tryRead(CAN_MESSAGE* message) {
             (*message).Header.ID = ((uint32_t)(*root).SIDH.SID << 21) | ((uint32_t)(*root).SIDL.SID << 18) | ((uint32_t)(*root).SIDL.EID << 16) | ((uint32_t)(*root).EIDH.EID << 8) | ((uint32_t)(*root).EIDL.EID);
             (*message).Flags.IsExtended = true;
         } else {
-            (*message).Header.ID = ((*root).SIDH.SID << 3) | (*root).SIDL.SID;
+            (*message).Header.ID = (uint16_t)(((*root).SIDH.SID << 3) | (*root).SIDL.SID);
             (*message).Flags.IsExtended = false;
         }
         (*message).Flags.Length = (*root).DLC.DLC;
@@ -213,14 +213,14 @@ bool can_tryWrite(CAN_MESSAGE message) {
     if (TXB0CONbits.TXREQ) { return false; }
 
     if (message.Flags.IsExtended) {
-        TXB0EIDLbits.EID = message.Header.ID & 0xFF;
-        TXB0EIDHbits.EID = (message.Header.ID >> 8) & 0xFF;
-        TXB0SIDLbits.EID = (message.Header.ID >> 16) & 0x03;
-        TXB0SIDLbits.SID = (message.Header.ID >> 18) & 0x07;
-        TXB0SIDHbits.SID = (message.Header.ID >> 21);
+        TXB0EIDLbits.EID = (uint8_t)(message.Header.ID & 0xFF);
+        TXB0EIDHbits.EID = (uint8_t)((message.Header.ID >> 8) & 0xFF);
+        TXB0SIDLbits.EID = (uint8_t)((message.Header.ID >> 16) & 0x03);
+        TXB0SIDLbits.SID = (uint8_t)((message.Header.ID >> 18) & 0x07);
+        TXB0SIDHbits.SID = (uint8_t)(message.Header.ID >> 21);
     } else {
-        TXB0SIDLbits.SID = message.Header.ID & 0x07;
-        TXB0SIDHbits.SID = message.Header.ID >> 3;
+        TXB0SIDLbits.SID = (uint8_t)(message.Header.ID & 0x07);
+        TXB0SIDHbits.SID = (uint8_t)(message.Header.ID >> 3);
     }
 
     TXB0SIDLbits.EXIDE = message.Flags.IsExtended;
