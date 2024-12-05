@@ -53,7 +53,7 @@ typedef union {
 } CAN_RAW_STATUS;
 
 
-CAN_RX* RxRegisters[8] = { (CAN_RX*)&RXB0CON, (CAN_RX*)&RXB1CON, (CAN_RX*)&B0CON, (CAN_RX*)&B1CON, (CAN_RX*)&B2CON, (CAN_RX*)&B3CON, (CAN_RX*)&B4CON, (CAN_RX*)&B5CON };
+volatile CAN_RX* RxRegisters[8] = { (CAN_RX*)&RXB0CON, (CAN_RX*)&RXB1CON, (CAN_RX*)&B0CON, (CAN_RX*)&B1CON, (CAN_RX*)&B2CON, (CAN_RX*)&B3CON, (CAN_RX*)&B4CON, (CAN_RX*)&B5CON };
 uint16_t speed = 0;
 CAN_STATE canState = CAN_STATE_CLOSED;
 
@@ -179,7 +179,7 @@ CAN_STATUS can_getStatus() {
 
 
 bool can_tryRead(CAN_MESSAGE* message) {
-    CAN_RX* root = RxRegisters[CANCON & 0x0F];
+    volatile CAN_RX* root =  RxRegisters[ECANCON & 0b111];
 
     if ((*root).CON.RXFUL) {
         if ((*root).SIDL.EXID) { //extended
