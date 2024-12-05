@@ -53,47 +53,47 @@ void can_init_internal(uint8_t brp, uint8_t prseg, uint8_t seg1ph, uint8_t seg2p
 }
 
 
-void can_setup(uint8_t brp, uint8_t prseg, uint8_t seg1ph, uint8_t seg2ph, uint8_t sjw, bool sampleThree) {
+void can_init(uint8_t brp, uint8_t prseg, uint8_t seg1ph, uint8_t seg2ph, uint8_t sjw, bool sampleThree) {
     can_init_internal(brp, prseg, seg1ph, seg2ph, sjw, sampleThree);
     speed = 0;
 }
 
-void can_setup_20k() {
+void can_init_20k() {
     can_init_internal(59, 7, 6, 3, 0, true);  // PRSEG: 8 Tq  SEG1PH: 7 Tq  SEG2PH: 4 Tq  SJW: 1 Tq  (20 Tq  0.25%  3000m)
     speed = 20;
 }
 
-void can_setup_50k() {
+void can_init_50k() {
     can_init_internal(39, 4, 3, 1, 0, true);  // PRSEG: 5 Tq  SEG1PH: 4 Tq  SEG2PH: 2 Tq  SJW: 1 Tq  (12 Tq  0.42%  1000m)
     speed = 50;
 }
 
-void can_setup_100k() {
+void can_init_100k() {
     can_init_internal(19, 4, 3, 1, 0, true);  // PRSEG: 5 Tq  SEG1PH: 4 Tq  SEG2PH: 2 Tq  SJW: 1 Tq  (12 Tq  0.42%  700m)
     speed = 100;
 }
 
-void can_setup_125k() {
+void can_init_125k() {
     can_init_internal(15, 4, 3, 1, 0, true);  // PRSEG: 5 Tq  SEG1PH: 4 Tq  SEG2PH: 2 Tq  SJW: 1 Tq  (12 Tq  0.42%  600m)
     speed = 125;
 }
 
-void can_setup_250k() {
+void can_init_250k() {
     can_init_internal(7, 4, 3, 1, 0, true);  // PRSEG: 5 Tq  SEG1PH: 4 Tq  SEG2PH: 2 Tq  SJW: 1 Tq  (12 Tq  0.42%  200m)
     speed = 250;
 }
 
-void can_setup_500k() {
+void can_init_500k() {
     can_init_internal(3, 4, 3, 1, 0, true);  // PRSEG: 5 Tq  SEG1PH: 4 Tq  SEG2PH: 2 Tq  SJW: 1 Tq  (12 Tq  0.42%  100m)
     speed = 500;
 }
 
-void can_setup_800k() {
+void can_init_800k() {
     can_init_internal(2, 3, 2, 1, 0, true);  // PRSEG: 4 Tq  SEG1PH: 3 Tq  SEG2PH: 2 Tq  SJW: 1 Tq  (10 Tq  0.50%  50m)
     speed = 800;
 }
 
-void can_setup_1000k() {
+void can_init_1000k() {
     can_init_internal(1, 5, 2, 1, 0, true);  // PRSEG: 6 Tq  SEG1PH: 3 Tq  SEG2PH: 2 Tq  SJW: 1 Tq  (12 Tq  0.42%  50m)
     speed = 1000;
 }

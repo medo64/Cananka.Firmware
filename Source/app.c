@@ -45,13 +45,13 @@ void main(void) {
 
     uint8_t brp; uint8_t prseg; uint8_t seg1ph; uint8_t seg2ph; uint8_t sjw; bool sampleThree; uint8_t autoOpenIndex;
     if (settings_getCanBusConfig(&brp, &prseg, &seg1ph, &seg2ph, &sjw, &sampleThree, &autoOpenIndex)) {
-        can_setup(brp, prseg, seg1ph, seg2ph, sjw, sampleThree);
+        can_init(brp, prseg, seg1ph, seg2ph, sjw, sampleThree);
         switch (autoOpenIndex) {
             case 1: can_open(); break;
             case 2: can_openListenOnly(); break;
         }
     } else {
-        can_setup_125k();
+        can_init_125k();
     }
 
 
