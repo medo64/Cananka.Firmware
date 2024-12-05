@@ -5,44 +5,6 @@
 #include "can.h"
 #include "io.h"
 
-
-typedef struct {
-    struct {
-        unsigned       : 1;
-        unsigned       : 1;
-        unsigned       : 1;
-        unsigned       : 1;
-        unsigned       : 1;
-        unsigned RTRRO : 1;
-        unsigned RXM1  : 1;
-        unsigned RXFUL : 1;
-    } CON;
-    struct {
-        unsigned SID  : 8;
-    } SIDH;
-    struct {
-        unsigned EID  : 2;
-        unsigned      : 1;
-        unsigned EXID : 1;
-        unsigned      : 1;
-        unsigned SID  : 3;
-    } SIDL;
-    struct {
-        unsigned EID  : 8;
-    } EIDH;
-    struct {
-        unsigned EID  : 8;
-    } EIDL;
-    struct {
-        unsigned DLC  : 4;
-        unsigned      : 2;
-        unsigned      : 1;
-        unsigned      : 1;
-    } DLC;
-    uint8_t D[8];
-} CAN_RX;
-
-
 typedef union {
     struct {
         uint8_t COMSTAT;
@@ -52,8 +14,6 @@ typedef union {
     };
 } CAN_RAW_STATUS;
 
-
-volatile CAN_RX* RxRegisters[8] = { (CAN_RX*)&RXB0CON, (CAN_RX*)&RXB1CON, (CAN_RX*)&B0CON, (CAN_RX*)&B1CON, (CAN_RX*)&B2CON, (CAN_RX*)&B3CON, (CAN_RX*)&B4CON, (CAN_RX*)&B5CON };
 uint16_t speed = 0;
 CAN_STATE canState = CAN_STATE_CLOSED;
 
@@ -88,7 +48,7 @@ void can_init_internal(uint8_t brp, uint8_t prseg, uint8_t seg1ph, uint8_t seg2p
     BRGCON2bits.SAM    = sampleThree;  // SAM
 
     CANCONbits.REQOP = 0b001; //set to sleep/disabled
-    while (CANSTATbits.OPMODE != 0b001);
+    while (CANSTATbits.OPMODE != 0b001) { Nop(); }
     canState = CAN_STATE_CLOSED;
 }
 
@@ -146,27 +106,27 @@ uint16_t can_getSpeed() {
 
 void can_open() {
     CANCONbits.REQOP = 0b000; //set to normal mode
-    while (CANSTATbits.OPMODE != 0b000);
+    while (CANSTATbits.OPMODE != 0b000) { Nop(); }
     canState = CAN_STATE_OPEN;
 }
 
 void can_openListenOnly() {
     CANCONbits.REQOP = 0b011; //set to listen-only mode
-    while (CANSTATbits.OPMODE != 0b011);
+    while (CANSTATbits.OPMODE != 0b011) { Nop(); }
     canState = CAN_STATE_OPEN_LISTENONLY;
 }
 
 void can_openLoopback() {
     CANCONbits.REQOP = 0b010; //set to loopback mode
-    while (CANSTATbits.OPMODE != 0b010);
+    while (CANSTATbits.OPMODE != 0b010) { Nop(); }
     canState = CAN_STATE_OPEN_LOOPBACK;
 }
 
 void can_close() {
     CANCONbits.REQOP = 0b100; //set to configuration
-    while (CANSTATbits.OPMODE != 0b100);
+    while (CANSTATbits.OPMODE != 0b100) { Nop(); }
     CANCONbits.REQOP = 0b001; //set to sleep/disabled
-    while (CANSTATbits.OPMODE != 0b001);
+    while (CANSTATbits.OPMODE != 0b001) { Nop(); }
     canState = CAN_STATE_CLOSED;
 }
 
@@ -186,32 +146,38 @@ CAN_STATUS can_getStatus() {
     return status.STATUS;
 }
 
-
 bool can_tryRead(CAN_MESSAGE* message) {
-    volatile CAN_RX* root =  RxRegisters[ECANCON & 0b111];
+    //if (COMSTATbits.FIFOEMPTY) { return false; }
 
-    if ((*root).CON.RXFUL) {
-        if ((*root).SIDL.EXID) { //extended
-            (*message).Header.ID = ((uint32_t)(*root).SIDH.SID << 21) | ((uint32_t)(*root).SIDL.SID << 18) | ((uint32_t)(*root).SIDL.EID << 16) | ((uint32_t)(*root).EIDH.EID << 8) | ((uint32_t)(*root).EIDL.EID);
-            (*message).Flags.IsExtended = true;
-        } else {
-            (*message).Header.ID = (uint16_t)(((*root).SIDH.SID << 3) | (*root).SIDL.SID);
-            (*message).Flags.IsExtended = false;
-        }
-        (*message).Flags.Length = (*root).DLC.DLC;
-        if (!(*root).CON.RTRRO) {
-            (*message).Flags.IsRemoteRequest = false;
-            for (uint8_t i = 0; i < (*message).Flags.Length; i++) {
-                (*message).Data[i] = (*root).D[i];
+    for (uint8_t i = 0b10000; i <= 0b10111; i++) {
+        ECANCONbits.EWIN = i;;  // select buffer into 0xF60 - 0xF6D
+        if (RXB0CONbits.RXFUL) {
+            if (RXB0SIDLbits.EXID) { //extended
+                (*message).Header.ID = ((uint32_t)RXB0SIDHbits.SID << 21) | ((uint32_t)RXB0SIDLbits.SID << 18) | ((uint32_t)RXB0SIDLbits.EID << 16) | ((uint32_t)RXB0EIDHbits.EID << 8) | RXB0EIDLbits.EID;
+                (*message).Flags.IsExtended = true;
+            } else {
+                (*message).Header.ID = ((uint32_t)RXB0SIDHbits.SID << 3) | RXB0SIDLbits.SID;
+                (*message).Flags.IsExtended = false;
             }
-        } else {
-            (*message).Flags.IsRemoteRequest = true;
+            (*message).Flags.Length = RXB0DLCbits.DLC;
+            if (RXB0CONbits.RTRRO) {
+                (*message).Flags.IsRemoteRequest = true;
+            } else {
+                (*message).Flags.IsRemoteRequest = false;
+                (*message).Data[0] = RXB0D0;
+                (*message).Data[1] = RXB0D1;
+                (*message).Data[2] = RXB0D2;
+                (*message).Data[3] = RXB0D3;
+                (*message).Data[4] = RXB0D4;
+                (*message).Data[5] = RXB0D5;
+                (*message).Data[6] = RXB0D6;
+                (*message).Data[7] = RXB0D7;
+            }
+            RXB0CONbits.RXFUL = 0;
+            return true;
         }
-        (*root).CON.RXFUL = 0;
-        return true;
-    } else {
-        return false;
     }
+    return false;
 }
 
 void can_read(CAN_MESSAGE* message) {
