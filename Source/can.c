@@ -57,20 +57,35 @@ volatile CAN_RX* RxRegisters[8] = { (CAN_RX*)&RXB0CON, (CAN_RX*)&RXB1CON, (CAN_R
 uint16_t speed = 0;
 CAN_STATE canState = CAN_STATE_CLOSED;
 
-void can_init() {
+void can_init_internal(uint8_t brp, uint8_t prseg, uint8_t seg1ph, uint8_t seg2ph, uint8_t sjw, bool sampleThree) {
     TRISB2 = 0;
     TRISB3 = 1;
-    CIOCONbits.ENDRHI = 1; //drive Vdd when recessive
+    CIOCONbits.ENDRHI = 1;  // drive Vdd when recessive
+    CIOCONbits.CANCAP = 1;  // enable CAN capture
 
     CANCONbits.REQOP = 0b100; //set to Configuration mode
-    while (CANSTATbits.OPMODE != 0b100);
+    while (CANSTATbits.OPMODE != 0b100) { Nop(); }
 
     BRGCON2bits.SEG2PHTS =  1; //freely programmable SEG2PH
     ECANCONbits.MDSEL = 2; //enhanced FIFO mode
 
-    for (uint8_t i = 0; i < (sizeof(RxRegisters) / sizeof(RxRegisters[0])); i++) {
-        (*RxRegisters[i]).CON.RXM1 = 1; //receive all messages
-    }
+    // use 8 buffers for receive (each set to receive all messages)
+    RXB0CONbits.RXM1 = 1;
+    RXB1CONbits.RXM1 = 1;
+    B0CONbits.RXM1 = 1;
+    B1CONbits.RXM1 = 1;
+    B2CONbits.RXM1 = 1;
+    B3CONbits.RXM1 = 1;
+    B4CONbits.RXM1 = 1;
+    B5CONbits.RXM1 = 1;
+
+    // baud rate
+    BRGCON1bits.BRP    = brp;          // BRP
+    BRGCON2bits.PRSEG  = prseg;        // PRSEG
+    BRGCON2bits.SEG1PH = seg1ph;       // SEG1PH
+    BRGCON3bits.SEG2PH = seg2ph;       // SEG2PH
+    BRGCON1bits.SJW    = sjw;          // SJW
+    BRGCON2bits.SAM    = sampleThree;  // SAM
 
     CANCONbits.REQOP = 0b001; //set to sleep/disabled
     while (CANSTATbits.OPMODE != 0b001);
@@ -79,53 +94,47 @@ void can_init() {
 
 
 void can_setup(uint8_t brp, uint8_t prseg, uint8_t seg1ph, uint8_t seg2ph, uint8_t sjw, bool sampleThree) {
-    can_init();
-    BRGCON1bits.BRP    = brp;         //BRP
-    BRGCON2bits.PRSEG  = prseg;       //PRSEG
-    BRGCON2bits.SEG1PH = seg1ph;      //SEG1PH
-    BRGCON3bits.SEG2PH = seg2ph;      //SEG2PH
-    BRGCON1bits.SJW    = sjw;         //SJW
-    BRGCON2bits.SAM    = sampleThree; //SAM
+    can_init_internal(brp, prseg, seg1ph, seg2ph, sjw, sampleThree);
     speed = 0;
 }
 
 void can_setup_20k() {
-    can_setup(59, 7, 6, 3, 0, true); //PRSEG: 8 Tq  SEG1PH: 7 Tq  SEG2PH: 4 Tq  SJW: 1 Tq  (20 Tq  0.25%  3000m)
+    can_init_internal(59, 7, 6, 3, 0, true);  // PRSEG: 8 Tq  SEG1PH: 7 Tq  SEG2PH: 4 Tq  SJW: 1 Tq  (20 Tq  0.25%  3000m)
     speed = 20;
 }
 
 void can_setup_50k() {
-    can_setup(39, 4, 3, 1, 0, true); //PRSEG: 5 Tq  SEG1PH: 4 Tq  SEG2PH: 2 Tq  SJW: 1 Tq  (12 Tq  0.42%  1000m)
+    can_init_internal(39, 4, 3, 1, 0, true);  // PRSEG: 5 Tq  SEG1PH: 4 Tq  SEG2PH: 2 Tq  SJW: 1 Tq  (12 Tq  0.42%  1000m)
     speed = 50;
 }
 
 void can_setup_100k() {
-    can_setup(19, 4, 3, 1, 0, true); //PRSEG: 5 Tq  SEG1PH: 4 Tq  SEG2PH: 2 Tq  SJW: 1 Tq  (12 Tq  0.42%  700m)
+    can_init_internal(19, 4, 3, 1, 0, true);  // PRSEG: 5 Tq  SEG1PH: 4 Tq  SEG2PH: 2 Tq  SJW: 1 Tq  (12 Tq  0.42%  700m)
     speed = 100;
 }
 
 void can_setup_125k() {
-    can_setup(15, 4, 3, 1, 0, true); //PRSEG: 5 Tq  SEG1PH: 4 Tq  SEG2PH: 2 Tq  SJW: 1 Tq  (12 Tq  0.42%  600m)
+    can_init_internal(15, 4, 3, 1, 0, true);  // PRSEG: 5 Tq  SEG1PH: 4 Tq  SEG2PH: 2 Tq  SJW: 1 Tq  (12 Tq  0.42%  600m)
     speed = 125;
 }
 
 void can_setup_250k() {
-    can_setup(7, 4, 3, 1, 0, true); //PRSEG: 5 Tq  SEG1PH: 4 Tq  SEG2PH: 2 Tq  SJW: 1 Tq  (12 Tq  0.42%  200m)
+    can_init_internal(7, 4, 3, 1, 0, true);  // PRSEG: 5 Tq  SEG1PH: 4 Tq  SEG2PH: 2 Tq  SJW: 1 Tq  (12 Tq  0.42%  200m)
     speed = 250;
 }
 
 void can_setup_500k() {
-    can_setup(3, 4, 3, 1, 0, true); //PRSEG: 5 Tq  SEG1PH: 4 Tq  SEG2PH: 2 Tq  SJW: 1 Tq  (12 Tq  0.42%  100m)
+    can_init_internal(3, 4, 3, 1, 0, true);  // PRSEG: 5 Tq  SEG1PH: 4 Tq  SEG2PH: 2 Tq  SJW: 1 Tq  (12 Tq  0.42%  100m)
     speed = 500;
 }
 
 void can_setup_800k() {
-    can_setup(2, 3, 2, 1, 0, true); //PRSEG: 4 Tq  SEG1PH: 3 Tq  SEG2PH: 2 Tq  SJW: 1 Tq  (10 Tq  0.50%  50m)
+    can_init_internal(2, 3, 2, 1, 0, true);  // PRSEG: 4 Tq  SEG1PH: 3 Tq  SEG2PH: 2 Tq  SJW: 1 Tq  (10 Tq  0.50%  50m)
     speed = 800;
 }
 
 void can_setup_1000k() {
-    can_setup(1, 5, 2, 1, 0, true); //PRSEG: 6 Tq  SEG1PH: 3 Tq  SEG2PH: 2 Tq  SJW: 1 Tq  (12 Tq  0.42%  50m)
+    can_init_internal(1, 5, 2, 1, 0, true);  // PRSEG: 6 Tq  SEG1PH: 3 Tq  SEG2PH: 2 Tq  SJW: 1 Tq  (12 Tq  0.42%  50m)
     speed = 1000;
 }
 
