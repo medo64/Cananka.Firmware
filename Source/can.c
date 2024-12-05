@@ -147,7 +147,7 @@ CAN_STATUS can_getStatus() {
 }
 
 bool can_tryRead(CAN_MESSAGE* message) {
-    //if (COMSTATbits.FIFOEMPTY) { return false; }
+    if (COMSTATbits.NOT_FIFOEMPTY == 0) { return false; }
 
     for (uint8_t i = 0b10000; i <= 0b10111; i++) {
         ECANCONbits.EWIN = i;;  // select buffer into 0xF60 - 0xF6D
