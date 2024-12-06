@@ -123,10 +123,17 @@ void can_openLoopback() {
 }
 
 void can_close() {
+    // abort stuff in progress
+    TXB0CONbits.TXABT = 0;
+    TXB1CONbits.TXABT = 0;
+    TXB2CONbits.TXABT = 0;
+
+    // switch to sleep (roundabout way via config in order to avoid errata)
     CANCONbits.REQOP = 0b100; //set to configuration
     while (CANSTATbits.OPMODE != 0b100) { Nop(); }
     CANCONbits.REQOP = 0b001; //set to sleep/disabled
     while (CANSTATbits.OPMODE != 0b001) { Nop(); }
+
     canState = CAN_STATE_CLOSED;
 }
 
