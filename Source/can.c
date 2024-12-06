@@ -193,35 +193,40 @@ void can_read(CAN_MESSAGE* message) {
 
 
 bool can_tryWrite(CAN_MESSAGE message) {
-    if (TXB0CONbits.TXREQ) { return false; }
+    for (uint8_t i = 0b00011; i <= 0b00101; i++) {
+        ECANCONbits.EWIN = i;;  // select TX buffer into 0xF60 - 0xF6D (RXB0)
 
-    if (message.Flags.IsExtended) {
-        TXB0EIDLbits.EID = (uint8_t)(message.Header.ID & 0xFF);
-        TXB0EIDHbits.EID = (uint8_t)((message.Header.ID >> 8) & 0xFF);
-        TXB0SIDLbits.EID = (uint8_t)((message.Header.ID >> 16) & 0x03);
-        TXB0SIDLbits.SID = (uint8_t)((message.Header.ID >> 18) & 0x07);
-        TXB0SIDHbits.SID = (uint8_t)(message.Header.ID >> 21);
-    } else {
-        TXB0SIDLbits.SID = (uint8_t)(message.Header.ID & 0x07);
-        TXB0SIDHbits.SID = (uint8_t)(message.Header.ID >> 3);
+        if ((RXB0CON & 0b00001000) == 0) {  // !TXBnCON.TXREQ
+            if (message.Flags.IsExtended) {
+                RXB0EIDLbits.EID = (uint8_t)(message.Header.ID & 0xFF);         // TXBnEIDL
+                RXB0EIDHbits.EID = (uint8_t)((message.Header.ID >> 8) & 0xFF);  // TXBnEIDH
+                RXB0SIDLbits.EID = (uint8_t)((message.Header.ID >> 16) & 0x03);  // TXBnSIDL
+                RXB0SIDLbits.SID = (uint8_t)((message.Header.ID >> 18) & 0x07);  // TXBnSIDL
+                RXB0SIDHbits.SID = (uint8_t)(message.Header.ID >> 21);           // TXBnSIDH
+            } else {
+                RXB0SIDLbits.SID = (uint8_t)(message.Header.ID & 0x07);          // TXBnSIDL
+                RXB0SIDHbits.SID = (uint8_t)(message.Header.ID >> 3);            // TXBnSIDH
+            }
+
+            RXB0SIDLbits.EXID = message.Flags.IsExtended;       // TXBnSIDL.EXID
+            RXB0DLCbits.DLC = message.Flags.Length;             // TXBnDLC
+            RXB0DLCbits.RXRTR = message.Flags.IsRemoteRequest;  // TXBnDLC.TXRTR
+
+            RXB0D0 = message.Data[0];  //TXBnD0
+            RXB0D1 = message.Data[1];  //TXBnD1
+            RXB0D2 = message.Data[2];  //TXBnD2
+            RXB0D3 = message.Data[3];  //TXBnD3
+            RXB0D4 = message.Data[4];  //TXBnD4
+            RXB0D5 = message.Data[5];  //TXBnD5
+            RXB0D6 = message.Data[6];  //TXBnD6
+            RXB0D7 = message.Data[7];  //TXBnD7
+
+            RXB0CON |= 0b00001000;  // TXBnCON.TXREQ = 1
+            return true;
+        }
     }
 
-    TXB0SIDLbits.EXIDE = message.Flags.IsExtended;
-    TXB0DLCbits.DLC = message.Flags.Length;
-    TXB0DLCbits.TXRTR = message.Flags.IsRemoteRequest;
-
-    TXB0D0 = message.Data[0];
-    TXB0D1 = message.Data[1];
-    TXB0D2 = message.Data[2];
-    TXB0D3 = message.Data[3];
-    TXB0D4 = message.Data[4];
-    TXB0D5 = message.Data[5];
-    TXB0D6 = message.Data[6];
-    TXB0D7 = message.Data[7];
-
-    TXB0CONbits.TXREQ = 1;
-
-    return true;
+    return false;
 }
 
 bool can_write(CAN_MESSAGE message) {
